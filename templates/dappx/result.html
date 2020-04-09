@@ -1,0 +1,37 @@
+<html>
+<head>
+    <style>
+
+
+
+    </style>
+</head>
+<body>
+
+{% load static %}
+
+<link rel = "stylesheet" type = "text/css" href = "{% static 'dappx/style.css' %}">
+
+<div class = "result">
+
+<h2>{{question.question_text}}</h2>
+
+
+{% for choice in question.choice_set.all %}
+
+    <p>{{ choice.choice_text  }} ---->  {{ choice.vote }}</p>
+
+
+{% endfor %}
+
+
+ </div>
+<br>
+<div style = "text-align:center;"><a href="{% url 'dappx:detail' question.id %}">Wanna vote again </a>
+<p>or</p>
+    <a href="{% url 'dappx:index' %}">Go to College list</a>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<div>
+<h1 align ="center">Polling application</h1>
+
+{% if user.is_authenticated %}
+
+
+
+<hr>
+
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'dappx/style.css' %}">
+
+{% for i in query %}
+<p>Welcome, <b>{{ i.name }}</b>. This is simple polling
+application where you can vote for participants for any
+of the listed college</p>
+
+
+
+    {% endfor %}
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+{% if latest_question_list %}
+
+
+   {% for question in latest_question_list %}
+    <p style = "text-align:center"><b>Voting lines</b> open from {{ question.pub_date }}
+       </p>
+
+{% if question.choice_set.all %}
+<div class = "gniot">
+
+
+             <a href = "{% url 'dappx:detail' question.id %}">{{question.question_text}}</a>({{ question.choice_set.count }} <b>choice</b>{{ question.choice_set.count|pluralize }})
+
+</div>
+{% else %}
+<div class = "gniot">
+            <b>{{ question.question_text }} </b>(No choice)
+
+</div>
+{% endif %}
+
+{% endfor %}
+
+{% endif %}
+    {% else %}
+    <h2>Please <a href = "{% url 'dappx:user_login' %}">Login</a> here</h2>
+
+{% endif %}
+</div>
+{% endblock %}
+
+
+
+
+<br>
+<br>
+
+
+
+
+

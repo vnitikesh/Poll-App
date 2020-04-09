@@ -1,0 +1,48 @@
+
+
+
+<h1>{{ question.question_text }}</h1>
+
+{% if error_message %}
+
+    {{ error_message }}
+
+{% endif %}
+
+
+
+
+
+
+
+  <form method = "post" action = "{% url 'dappx:vote' question.id %}">
+        {% csrf_token %}
+        {% for choice in question.choice_set.all %}
+
+            <input type = "radio" name = "choice" value = "{{ choice.id }}" id = "choice{{ forloop.counter }}">
+            <label for = "choice{{ forloop.counter }}">{{choice.choice_text}} ({{ choice.vote }})</label>
+
+        <br>
+
+        {% endfor %}
+        <input type = "submit" value = "Vote">
+
+    </form>
+<a href="{% url 'dappx:index' %}">Go to College list</a>
+
+
+
+
+
+
+
+
+
+
+<!--<form action = "{url 'example_poll:vote' question.id}" method = "post">
+    {% csrf_token %}
+
+
+</form>
+
+-->

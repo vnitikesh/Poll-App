@@ -1,0 +1,28 @@
+a{
+    color:green;
+    text-decoration:none;
+}
+.gniot{
+border: 1px solid red;
+text-align:center;
+padding: 40px;
+width:200px;
+margin:auto;
+
+}
+
+.result{
+            border: 1px solid black;
+            text-align:center;
+            width:400px;
+            margin: auto;
+            background-color:red;
+            color:white;
+        }
+
+#yesbank{
+
+    width:400px;
+    height:200px;
+    background: url("images/gniot.jpg") 40px 50px;
+}
