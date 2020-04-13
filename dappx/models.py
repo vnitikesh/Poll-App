@@ -11,8 +11,7 @@ from django.utils import timezone
 class UserProfileInfo(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.user.username
+    
 
 class Question(models.Model):
     objects = None
