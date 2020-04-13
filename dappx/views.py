@@ -14,7 +14,7 @@ from django.views import generic
 
 # Create your views here.
 
-@login_required
+#@login_required Use comment when testing test cases, otherwise uncomment it before firing server
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect(reverse('dappx:index'))
