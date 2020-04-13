@@ -1,11 +1,78 @@
 from django.test import TestCase, Client
 from django.utils import timezone
 import datetime
-from .models import Question
+from .models import Question,Choice
 from django.urls import reverse, resolve
-from .views import IndexView, DetailView, vote, ResultsView
-from . import views
+from django.contrib.auth.models import User
 
+
+class LoginViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+
+    def test_login_view_authenticated_user(self):
+        res = self.client.get(reverse('dappx:user_login'))
+        self.assertEquals(res.status_code,200)
+        self.username = 'nitikesh'
+        self.password = '123'
+        user = User.objects.create(username = self.username)
+        user.set_password(self.password)
+        user.save()
+        res = self.client.post(reverse('dappx:user_login'), {'username':'nitikesh', 'password':'123'})
+        self.assertEqual(res.status_code,302)
+        res = self.client.get(reverse('dappx:index'))
+        self.assertEqual(res.status_code,200)
+        self.assertTemplateUsed(res, 'dappx/index.html')
+
+    def test_login_view_unauthenticated_user(self):
+        res = self.client.get(reverse('dappx:user_login'))
+        self.assertEqual(res.status_code,200)
+        self.assertTrue(b'Login' in res.content)
+        res = self.client.post(reverse('dappx:user_login'),{'username':'nitikesh', 'password':'123'})
+        self.assertEqual(res.status_code,200)
+
+
+
+
+class LogoutView(TestCase):
+    def setUp(self):
+        self.client = Client()
+    def test_logout_view(self):
+        self.username = 'nitikesh'
+        self.password = '123'
+        user = User.objects.create(username=self.username)
+        user.set_password(self.password)
+        user.save()
+        res = self.client.post(reverse('dappx:user_login'), {'username': 'nitikesh', 'password': '123'})
+        self.assertEqual(res.status_code,302)
+        res = self.client.get(reverse('dappx:index'))
+        self.assertTrue(b'Logout' in res.content)
+        self.client.logout()
+        res = self.client.get(reverse('logout'))
+        self.assertEqual(res.status_code,302)
+        res = self.client.get(reverse('dappx:index'))
+        self.assertEqual(res.status_code,200)
+        self.assertTemplateUsed(res, 'dappx/index.html')
+
+
+class ModelTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def test_Question_model(self):
+        q = Question(question_text= 'hi there')
+        self.assertEqual(str(q),q.question_text)
+
+    def test_Choice_model(self):
+        c = Choice(choice_text = 'funny_text')
+        self.assertEqual(str(c), c.choice_text)
+
+
+
+def create_question(question_text, days):     #func is used to create questions with their respective parameters whenever they are called
+    time = timezone.now() + datetime.timedelta(days = days)    #creates time based on parameter passed
+    return Question.objects.create(question_text = question_text,pub_date = time)   #sends Question object with respective question_text and publish date
 
 class QuestionClassResultVoteViewTest(TestCase):
     def setUp(self):
@@ -20,10 +87,23 @@ class QuestionClassResultVoteViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_vote_view(self):
+        q = create_question(question_text= 'question is here', days = -2)
+        c = q.choice_set.create(choice_text = 'hello')
+        q1 = Question.objects.get(pk = q.id)
+        c1 = q1.choice_set.get(pk = c.id)
+        res = self.client.post(reverse('dappx:vote', args = (q1.id,)), {'choice':c1.id})
+        self.assertEqual(res.status_code,302)
+
+
+    def test_vote_view_no_choice(self):
         q = create_question(question_text='question is here', days=-2)
         c = q.choice_set.create(choice_text="hello")
-        response = self.client.post(reverse('dappx:vote', args=(c.id,)))
+        x = Question.objects.get(pk = q.id)
+        y = x.choice_set.get(pk = c.id)
+        response = self.client.post(reverse('dappx:vote', args=(x.id,)))
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'dappx/detail.html')
+
 
 
 class QuestionDetailViewTests(TestCase):
@@ -45,9 +125,8 @@ class QuestionDetailViewTests(TestCase):
 
 
 
-def create_question(question_text, days):     #func is used to create questions with their respective parameters whenever they are called
-    time = timezone.now() + datetime.timedelta(days = days)    #creates time based on parameter passed
-    return Question.objects.create(question_text = question_text,pub_date = time)   #sends Question object with respective question_text and publish date
+
+
 
 
 
@@ -55,29 +134,40 @@ def create_question(question_text, days):     #func is used to create questions 
 
 class QuestionIndexViewTests(TestCase):
 
-    # database is reset for each test method, so the first question is no longer there.
+
 
     def setUp(self):
         self.client = Client()
         self.quest_url = reverse('dappx:user_login')
+        self.username = 'nitikesh'
+        self.password = '123'
+        user = User.objects.create(username=self.username)
+        user.set_password(self.password)
+        user.save()
 
 
     def test_future_and_past_question(self):
         create_question(question_text="Past question", days=-30)
         create_question(question_text="Future question", days=30)
-        response = self.client.get(self.quest_url)
-        #print(response.status_code)
-        self.assertTemplateUsed(response, 'dappx/login.html')
-        #self.assertQuerysetEqual(response.context['latest_question_list'], ['<Question: Past question>'])
+
+
+        res = self.client.post(reverse('dappx:user_login'), {'username': 'nitikesh', 'password': '123'})
+
+        self.assertEqual(res.status_code,302)
+        res = self.client.get(reverse('dappx:index'))
+        self.assertTemplateUsed(res, 'dappx/index.html')
+        self.assertEqual(res.status_code,200)
+        self.assertQuerysetEqual(res.context['latest_question_list'], ['<Question: Past question>'])
+
 
 
     def test_future_question(self):
         create_question(question_text="Future question.", days=30)
-        response = self.client.get(self.quest_url)
-        print(response.status_code)
-        self.assertTemplateUsed(response, 'dappx/login.html')
-        self.assertContains(response, "No polls are available.", count=0)
-        #self.assertQuerysetEqual(response.context['latest_question_list'], [])
+        response = self.client.post(reverse('dappx:user_login'), {'username': 'nitikesh', 'password': '123'})
+        self.assertEqual(response.status_code,302)
+        res = self.client.get(reverse('dappx:index'))
+        self.assertTemplateUsed(res, 'dappx/index.html')
+        self.assertQuerysetEqual(res.context['latest_question_list'], [])
 
 
 
@@ -86,28 +176,30 @@ class QuestionIndexViewTests(TestCase):
 
 
     def test_no_question(self):  # checks the message: "No polls are available" and verifies the latest_question_list is empty. It doesn't create any questions.
-        response = self.client.get(self.quest_url)
-        self.assertEqual(response.status_code, 200)  # asserts that response.status_code == 200
-        self.assertContains(response, "No polls are available", count=0)  # text appears in the content of the given response instance
-        self.assertTemplateUsed(response, 'dappx/login.html')
-        #self.assertQuerysetEqual(response.context['latest_question_list'], [])  # asserts that query set(1st parameter) returns second parameter list of views.
+        response = self.client.post(reverse('dappx:user_login'), {'username': 'nitikesh', 'password': '123'})
+        self.assertEqual(response.status_code, 302)
+        res = self.client.get(reverse('dappx:index'))
+        self.assertTemplateUsed(res, 'dappx/index.html')
+        self.assertQuerysetEqual(res.context['latest_question_list'], [])  # asserts that query set(1st parameter) returns second parameter list of views.
 
     def test_past_question(self):
         create_question(question_text="Past question.", days=-30)
-        response = self.client.get(self.quest_url)
-
-        self.assertTemplateUsed(response, 'dappx/login.html')
-        #self.assertQuerysetEqual(response.context['latest_question_list'], ['<Question: Past question.>'])
+        response = self.client.post(reverse('dappx:user_login'), {'username': 'nitikesh', 'password': '123'})
+        self.assertEqual(response.status_code, 302)
+        res = self.client.get(reverse('dappx:index'))
+        self.assertTemplateUsed(res, 'dappx/index.html')
+        self.assertQuerysetEqual(res.context['latest_question_list'], ['<Question: Past question.>'])
 
 
 
     def test_two_past_questions(self):
         create_question(question_text="past question 1.", days=-30)
         create_question(question_text="past question 2.", days=-5)
-        response = self.client.get(self.quest_url)
-
-        self.assertTemplateUsed(response, 'dappx/login.html')
-        #self.assertQuerysetEqual(response.context['latest_question_list'], ['<Question: past question 2.>', '<Question: past question 1.>'])
+        response = self.client.post(reverse('dappx:user_login'), {'username': 'nitikesh', 'password': '123'})
+        self.assertEqual(response.status_code, 302)
+        res = self.client.get(reverse('dappx:index'))
+        self.assertTemplateUsed(res, 'dappx/index.html')
+        self.assertQuerysetEqual(res.context['latest_question_list'], ['<Question: past question 2.>', '<Question: past question 1.>'])
 
 
 class QuestionModelTests(TestCase):
@@ -129,15 +221,18 @@ class QuestionModelTests(TestCase):
 
 
 
+class RegisterViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
 
-
-
-
-
-
-
-
-
+    def test_register_view(self):
+        res = self.client.get(reverse('dappx:register'))
+        self.assertEquals(res.status_code,200)
+        self.assertTemplateUsed(res, 'dappx/registration.html')
+        res = self.client.post(reverse('dappx:register'), data = {'username':'abhishek', 'password':123,
+                                                                  'email':'abhishek@gmail.com'})
+        self.assertEqual(res.status_code,200)
+        self.assertTemplateUsed(res, 'dappx/registration.html')
 
 
 class TestUrls(TestCase):
@@ -148,33 +243,25 @@ class TestUrls(TestCase):
     def test_detail_url_is_resolved(self):
         url = reverse('dappx:detail', args =[1])
         print(resolve(url).func)
-        #print("\n")
-        #self.assertEquals(resolve(url).func,DetailView.as_view())
+
 
 
     def test_index_url_is_resolved(self):
         url = reverse('dappx:index')
         print(resolve(url).func)  #resolve() method takes a URL as a string and returns a ResolverMatch object which provides access to all attributes  of the resolved URL match.
-        #print('\n')
-        #self.assertEquals(resolve(url).func, IndexView())
+
 
 
     def test_result_url_is_resolve(self):
         url = reverse('dappx:results', args = [1])
         print(resolve(url).func)
-        print(ResultsView.as_view())
-        #print("\n")
-        #self.assertEquals(resolve(url).func,ResultsView.as_view())
+
 
 
 
     def test_vote_url_is_resolve(self):
         url = reverse('dappx:vote', kwargs = {'question_id': 1})
         print(resolve(url).func)
-        #print("\n")
-        #self.assertEquals(resolve(url).func, vote)
-
-
-
-
-
+        
+        
+        
