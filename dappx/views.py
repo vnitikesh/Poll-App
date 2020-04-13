@@ -91,7 +91,7 @@ class RegisterView(View):
             user.save()
             registered = True
         else:
-            print(user_form.errors)
+            pass
 
         return render(request,self.template_name,{'registered':registered, 'user_form':user_form,})
 
@@ -108,14 +108,12 @@ class LoginView(View):
         password = request.POST.get('password')
 
         user = authenticate(username= username, password= password)
-        #user1 = UserProfileInfo.objects.filter(name=username, password=password)
+
 
         if(user):
-            if(user.is_active):
-                login(request,user)
-                return HttpResponseRedirect(reverse('dappx:index'))
-            else:
-                return HttpResponse("Your account was inactive.")
+
+            login(request,user)
+            return HttpResponseRedirect(reverse('dappx:index'))
 
         else:
             return HttpResponse("Someone tried to login and failed. They used username: {} and password: {}".format(username,password))
