@@ -52,7 +52,6 @@ In order to Run all the test cases:- Go to terminal and enter the command 'pytho
 
 ***  In order to get the coverage report follow the steps:-
             Step1:- pip install coverage
-            After the coverage module is installed, goto
             Step2:- coverage erase(Erase all the previous variables.)
             Step3:- coverage run manage.py test dappx
             Step4:- coverage report -m
