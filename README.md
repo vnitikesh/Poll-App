@@ -33,3 +33,17 @@ Your project is ready to run on your local server environment.
 That's all you are registered for the website.
 
 10. Now go to login section, provide necessary credentials and wholla!!! you have access to the dashboard.
+
+
+*** The project also covers 'tests.py' file in the app section(dappx).
+   a). Go to dappx.
+   b). Open 'tests.py' file
+   c). In order to check the test cases hit the command:- "py manage.py test dappx"
+   d). There are some comment statement in tests.py file where some updates needs to be done.
+   
+   
+   You can also check the coverage report through following steps.
+   S1). coverage erase(erase all the old variables).
+   S2). coverage run manage.py test dappx.
+   S3). coverage report -m.
+    
