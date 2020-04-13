@@ -16,17 +16,22 @@ Setup Process:-
 Make sure python3 is installed on your machine. If not goto https://www/python.org/downloads and download the current version
 of python and add it to the necessary path.
 
-1. Open the IDE of your choice.
-2. Switch to the directory where you want to store the projects file.
-3. Activate the virtual environment.
+1. Open the command line terminal by pressing 'windows+r' key, enter cmd and hit enter.
+2. In the terminal switch to the directory where you want to run this project by entering 'cd dir_name'.
+3. Now switch to virtual environment by following steps:-
+      a).In the terminal, install the virtual environment configuration by inputting command 'pip install virtualenvwrapper'.
+      b).After virtual environment is installed, create a virtual env. by inputting command 'python3 -m ven venv'.
+      c).Activate the virtual environment by giving command:- source ./venv/activate.sh
+  If you have virtual env. installed in your system previously, skip the step (a).
+4). In the terminal, switch to the directory of the project by inputting 'cd Poll-App'. 
 4. Install the necessary dependencies by giving the command:- 'pip install -r requirements.txt'
 5. Make sure git for desktop is installed in your system for easily cloning of the project otherwise you can download
-   the zip file and setup the path variables.
-6. Clone the project by giving the command:- git clone https://github.com/ankuspidy/Poll-App.git
+   the zip file in the directory where you want to run this project.
+6. (For git desktop users)Clone the project by giving the command:- git clone https://github.com/ankuspidy/Poll-App.git
 
 Your project is ready to run on your local server environment.
 
-7. Give the command:- 'py manage.py runserver'
+7. Give the command:- 'python manage.py runserver'
 8. Open the browser and in the url pad type 127.0.0.1:8000//dappx/register
 9. Register yourself by providing username, password and email.
 
@@ -35,15 +40,11 @@ That's all you are registered for the website.
 10. Now go to login section, provide necessary credentials and wholla!!! you have access to the dashboard.
 
 
-*** The project also covers 'tests.py' file in the app section(dappx).
-   a). Go to dappx.
-   b). Open 'tests.py' file
-   c). In order to check the test cases hit the command:- "py manage.py test dappx"
-   d). There are some comment statement in tests.py file where some updates needs to be done.
+*** The project also covers 'tests.py' file at location Poll-App/dappx/tests.py which covers various test cases. 
+     In order to run all the test cases, Go to terminal and enter the command 'python manage.py test dappx' 
+      
    
    
-   You can also check the coverage report through following steps.
-   S1). coverage erase(erase all the old variables).
-   S2). coverage run manage.py test dappx.
-   S3). coverage report -m.
+   
+   
     
