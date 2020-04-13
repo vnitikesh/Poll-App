@@ -20,8 +20,8 @@ of python and add it to the necessary path.
 2. In the terminal switch to the directory where you want to run this project by entering 'cd dir_name'.
 3. Now switch to virtual environment by following steps:-
       a).In the terminal, install the virtual environment configuration by inputting command 'pip install virtualenvwrapper'.
-      b).After virtual environment is installed, create a virtual env. by inputting command 'python3 -m ven venv'.
-      c).Activate the virtual environment by giving command:- source ./venv/activate.sh
+      b).After virtual environment is installed, create a virtual env. by inputting command 'mkvirtualenv venv'.
+      c).Activate the virtual environment by giving command:- workon venv
   If you have virtual env. installed in your system previously, skip the step (a).
 4). In the terminal, switch to the directory of the project by inputting 'cd Poll-App'. 
 4. Install the necessary dependencies by giving the command:- 'pip install -r requirements.txt'
