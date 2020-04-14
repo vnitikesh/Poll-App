@@ -23,6 +23,12 @@ of python and add it to the necessary path.
       b).After virtual environment is installed, create a virtual env. by inputting command 'mkvirtualenv venv'.
       
   If you have virtual env. installed in your system previously, skip the step (a).
+
+
+
+Note:- For linux users, if above command does not work properly,then try to install and run virtual env using the command
+         (1). python -m venv .env
+         (2). source .env/bin/activate
   
 Note:- Make sure git for desktop is installed in your system for easily cloning of the project otherwise you can download
    the zip file in the directory where you want to run this project.
